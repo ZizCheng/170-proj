@@ -1,0 +1,3 @@
+[submodule "src/project-fa20-skeleton"]
+	path = src/project-fa20-skeleton
+	url = https://github.com/Berkeley-CS170/project-fa20-skeleton.git
