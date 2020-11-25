@@ -15,7 +15,7 @@ def solve(G, s):
         k: Number of breakout rooms
     """
     
-    randomizedSolver(G, s, 10000)
+    return randomizedSolver(G, s, 1000)
 
     
     pass
