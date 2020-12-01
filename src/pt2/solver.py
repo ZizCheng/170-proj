@@ -47,8 +47,7 @@ def randomizedSolver(G, s, checker_resolution):
     max_breakout_rooms = len(G.nodes)
     best_dictionary = initDictionary(max_breakout_rooms)
     if is_valid_solution(best_dictionary, G, s, 1):
-        max_happy = calculate_happiness(best_dictionary, G)
-        
+        max_happy = calculate_happiness(best_dictionary, G)     
     else:
         max_happy = 0
     numrooms = -1    
@@ -81,9 +80,9 @@ def randomlyDictionary(num, breakout_rooms):
 def permuteDictionary(d, num, breakout_rooms):
     permuted = False
     user = 0
-    print(breakout_rooms)
-    print(d)
-    print(d.get(user))
+    # print(breakout_rooms)
+    # print(d)
+    # print(d.get(user))
     while not permuted and user < num:
         if int(d.get(user)) == breakout_rooms:
             d[user] = 0
