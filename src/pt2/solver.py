@@ -15,8 +15,8 @@ def solve(G, s):
         k: Number of breakout rooms
     """
     
-    return greedyHappinessTraverser(G, s)
-    #return brute_forcer(G, s, 3)
+    #return greedyHappinessTraverser(G, s)
+    return brute_forcer(G, s, 3)
     #return randomizedSolver(G, s, 1000)
     #return initDictionary(len(G.nodes)), 1
 
