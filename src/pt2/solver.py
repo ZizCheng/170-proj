@@ -15,8 +15,8 @@ def solve(G, s):
         k: Number of breakout rooms
     """
     
-    #return greedyHappinessTraverser(G, s)
-    return brute_forcer(G, s, 3)
+    return greedyHappinessTraverser(G, s)
+    #return brute_forcer(G, s, 3)
     #return randomizedSolver(G, s, 1000)
     #return initDictionary(len(G.nodes)), 1
 
@@ -25,7 +25,7 @@ def solve(G, s):
 def greedyHappinessTraverser(G, s):
     # This algo uses a starting point of highest theoretical happiness: 1 room. 
     # Every move that the algo makes is to minimize the happiness lost by each turn.
-
+    print("Starting")
     num_students = len(G.nodes)
     singleroom_dictionary = initDictionary(num_students)
 
@@ -36,44 +36,59 @@ def greedyHappinessTraverser(G, s):
     numrooms = 2
     current_dictionary = {0: [i for i in range(0, num_students)]}
     found = False
-
     while not found:
         for k in range(2, num_students - 1):
             current_dictionary[k-1] = []
             sat = False
+            cashe = {str(current_dictionary): 0}
             while not sat:
-
-                current_dictionary = makeMove(current_dictionary, k, G)
-
-                if is_valid_solution(convert_dictionary(current_dictionary), G, s, k):
+                current_dictionary = makeMove(current_dictionary, k, G, cashe)
+                if current_dictionary == False:
+                    sat = True
+                elif is_valid_solution(convert_dictionary(current_dictionary), G, s, k):
                     found = True
                     sat = True
                     numrooms = k
-    return current_dictionary, k
+                elif min(getStressList(current_dictionary, k)) > s/k or cashe.get(str(current_dictionary), 0) is k - 1:
+                    sat = True
+    
+                    
+    return convert_dictionary(current_dictionary), k
 
-def getStressList(current_dictionary, k):
+def getStressList(current_dictionary, rooms):
     stress_list = []
-    for _ in range(0, k):
-        stress_list.append(calculate_stress_for_room(convert_dictionary(current_dictionary).get(k), G))
+    for k in range(0, rooms):
+        stress_list.append(calculate_stress_for_room(current_dictionary.get(k), G))
     return stress_list
 
-def makeMove(dic, k, G):
-    stress = getStressList(dic, k)
 
-    max_stressed_room = stress.index(max(stress))
-    min_stressed_room = stress.index(min(stress))
+import copy
+def makeMove(dic, k, G, cashe):
+    stress = getStressList(dic, k)
+    stressSorted = stress.copy()
+    stressSorted.sort()
+    max_stress_value = stressSorted[len(stress)-1]
+    max_stressed_room = stress.index(max_stress_value)
+
+    min_num = cashe.get(str(dic), 0)
+    if min_num == len(stress) - 1:
+        return dic
+    
+    min_stressed_room = stress.index(stressSorted[min_num])
     maxH = -1
-    maxDic = dic
-    tempdic = []
+    maxDic = dic.copy()
+    # print(stress, dic)
     for i in dic.get(max_stressed_room):
-        tempdic = dic
-        print(tempdic, i, max_stressed_room, min_stressed_room)
-        tempdic[min_stressed_room] = tempdic.get(min_stressed_room).append(i)
-        tempdic[max_stressed_room] = tempdic.get(max_stressed_room).remove(i)
+        tempdic = copy.deepcopy(dic)
+        # print(tempdic, i, max_stressed_room, min_stressed_room, tempdic.get(max_stressed_room))
+        tempdic.get(min_stressed_room).append(i)
+        tempdic.get(max_stressed_room).remove(i)
+        # print(tempdic)
         currentH = calculate_happiness(convert_dictionary(tempdic), G)
         if currentH > maxH:
             maxH = currentH
-            maxDic = tempdic
+            maxDic = tempdic.copy()
+    cashe[str(maxDic)] = cashe.get(str(maxDic), -1) + 1
     return maxDic
 
 
@@ -211,12 +226,13 @@ import glob
 if __name__ == '__main__':
     inputs = glob.glob('input/small/*')
     for input_path in inputs:
-        output_path = 'output/small/' + input_path[-6:-3] + '.out'
+        output_path = 'output/small/' + "".join(filter(str.isdigit, input_path[-6:-3])) + '.out'
         G, s = read_input_file(input_path, 100)
         D, k = solve(G, s)
-        print(D)
+        
         if is_valid_solution(D, G, s, k):
             cost_t = calculate_happiness(D, G)
+            print(D, cost_t, "".join(filter(str.isdigit, input_path[-6:-3])))
             write_output_file(D, output_path)
 
 # if __name__ == '__main__':
